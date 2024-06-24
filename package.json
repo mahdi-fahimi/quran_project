@@ -14,11 +14,13 @@
   },
   "dependencies": {
     "primeflex": "^3.3.1",
-    "primevue": "^3.52.0",
+    "primeicons": "^7.0.0",
+    "primevue": "4.0.0-rc.2",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"
   },
   "devDependencies": {
+    "@primevue/themes": "4.0.0-rc.2",
     "@rushstack/eslint-patch": "^1.8.0",
     "@tsconfig/node20": "^20.1.4",
     "@types/node": "^20.14.5",

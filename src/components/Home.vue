@@ -1,12 +1,24 @@
 <template>
   <div id="img-border" class="container ">
-    <div id="title">
-      <p>sura name</p>
+    <div id="title" class="mb-4">
+      <p class="UthmanicHafs1-font text-3xl"> الفاتحه </p>
     </div>
     <div id="sura-text" v-for="(aya, index) in text" :key="index">
-        {{ aya.aya_number }} - {{ aya.main_text }} <br>
-        {{ aya.translation }}
-      <Divider/>
+        <div id="aya">
+<!--          {{ aya.aya_number }}-->
+          <p class="UthmanicHafs1-font text-2xl">
+            {{ aya.main_text }}
+          </p>
+          <br>
+        </div>
+        <div id="translation">
+          <p class="vazir-font text-lg">
+            {{ aya.translation }}
+          </p>
+        </div>
+      <div v-if="index !== text.length-1">
+        <Divider/>
+      </div>
     </div>
   </div>
 </template>
@@ -146,6 +158,5 @@ console.log(text)
   border-image: url(../assets/images/border2.png) 106 round;
   width: 10rem;
   padding: 0.5rem;
-
 }
 </style>

@@ -84,3 +84,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@font-face {
+  font-family: UthmanicHafs1;
+  src: url(./fonts/UthmanicHafs1.otf);
+}
+
+@font-face {
+  font-family: vazir;
+  src: url(./fonts/Vazir-Regular-FD-WOL-UI.ttf);
+}
+
+.UthmanicHafs1-font{
+  font-family: UthmanicHafs1;
+}
+
+.vazir-font{
+  font-family: vazir;
+}

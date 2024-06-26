@@ -1,15 +1,42 @@
-<template>
-  <div id="img-border" class="container ">
-    <div id="title" class="mb-4">
-      <p class="UthmanicHafs1-font text-3xl"> الفاتحه </p>
+<template >
+  <div>
+    <SelectDropDown/>
+    <SelectDropDown/>
+  </div>
+  <div>
+    <Btn :severity="plusBtnProps.severity"
+         :icon="plusBtnProps.icon"
+         :raised="plusBtnProps.raised"
+         :rounded="plusBtnProps.rounded"
+    />
+    <Btn :severity="minusBtnProps.severity"
+         :icon="minusBtnProps.icon"
+         :raised="minusBtnProps.raised"
+         :rounded="minusBtnProps.rounded"
+    />
+  </div>
+  <div id="main-box" class="max-w-[90%] mx-auto">
+    <div id="sura-name" class="mb-4 text-center mx-auto w-40 p-2" >
+      <p class="uthmanTaha-font text-3xl text-center"> الفاتحه </p>
     </div>
     <div id="sura-text" v-for="(aya, index) in text" :key="index">
-        <div id="aya">
-<!--          {{ aya.aya_number }}-->
-          <p class="UthmanicHafs1-font text-2xl">
+        <div id="aya" class="flex gap-2">
+          <p class="uthmanTaha-font text-2xl mb-4">
             {{ aya.main_text }}
           </p>
-          <br>
+          <div id="aya-number" class="flex items-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Ra_bracket.png"
+                 alt="bracket"
+                 class="w-3"
+            >
+            <span class="vazir-font mx-1 text-lg">
+              {{ aya.aya_number }}
+            </span>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/La_bracket.png"
+                 alt="bracket"
+                 class="w-3"
+            >
+          </div>
         </div>
         <div id="translation">
           <p class="vazir-font text-lg">
@@ -23,9 +50,11 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import {ref} from "vue"
 import Divider from 'primevue/divider';
+import Btn from './Btn.vue'
+import SelectDropDown from "./SelectDropDown.vue";
 
 let text =ref( [
   {
@@ -140,23 +169,29 @@ let text =ref( [
     translation : 'معبود مردم،'
   },
 ])
-console.log(text)
-
+const plusBtnProps = {
+  severity: "Primary",
+  icon: "pi pi-plus",
+  raised: true,
+  rounded: true
+}
+const minusBtnProps = {
+  severity: "Primary",
+  icon: "pi pi-minus",
+  raised: true,
+  rounded: true
+}
 </script>
 
 <style scoped>
-#img-border {
+#main-box {
   border: 100px solid transparent;
-  padding: 15px;
   border-image: url(../assets/images/border1.png) 360 round;
   direction: rtl;
-  margin: 0;
 }
 
-#img-border #title{
-  border: 25px solid black;
+#main-box #sura-name{
+  border: 25px solid transparent;
   border-image: url(../assets/images/border2.png) 106 round;
-  width: 10rem;
-  padding: 0.5rem;
 }
 </style>

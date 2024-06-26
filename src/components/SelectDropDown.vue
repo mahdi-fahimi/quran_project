@@ -1,7 +1,13 @@
 
 <template>
   <div class="card flex justify-center mt-8">
-    <Select v-model="selectedCountry" :options="countries" filter variant="filled" optionLabel="name" placeholder="Select a Country" class="w-full md:w-56">
+    <Select v-model="selectedCountry"
+            :options="countries"
+            :filter="true"
+            variant="filled"
+            optionLabel="name"
+            :placeholder="countries[0].name"
+            class="w-full md:w-56">
 <!--      <template #value="slotProps">-->
         <div v-if="slotProps.value" class="flex items-center">
           <div>{{ slotProps.value.name }}</div>

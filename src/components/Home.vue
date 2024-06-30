@@ -1,25 +1,34 @@
 <template >
-  <div>
-    <SelectDropDown/>
-    <SelectDropDown/>
-  </div>
-  <div>
-    <Btn :severity="plusBtnProps.severity"
-         :icon="plusBtnProps.icon"
-         :raised="plusBtnProps.raised"
-         :rounded="plusBtnProps.rounded"
-    />
-    <Btn :severity="minusBtnProps.severity"
-         :icon="minusBtnProps.icon"
-         :raised="minusBtnProps.raised"
-         :rounded="minusBtnProps.rounded"
-    />
-  </div>
-  <div id="main-box" class="max-w-[90%] mx-auto">
-    <div id="sura-name" class="mb-4 text-center mx-auto w-40 p-2" >
-      <p class="uthmanTaha-font text-3xl text-center"> الفاتحه </p>
+  <div class="mt-6 relative">
+    <div class="flex gap-4 direction-rtl max-w-[87%] mx-auto my-4">
+      <!-- select sura -->
+      <SelectDropDown
+      :options="selectSuraProps.allSuraNames"
+      :filter="selectSuraProps.filter"
+      />
+      <!-- select translation -->
+      <SelectDropDown
+      :options="selectTranslationProps.allTranslatorsNames"
+      :filter="selectTranslationProps.filter"
+      />
     </div>
-    <div id="sura-text" v-for="(aya, index) in text" :key="index">
+    <div class="absolute top-72 left-4 flex flex-col gap-2">
+      <Btn :severity="plusBtnProps.severity"
+           :icon="plusBtnProps.icon"
+           :raised="plusBtnProps.raised"
+           :rounded="plusBtnProps.rounded"
+      />
+      <Btn :severity="minusBtnProps.severity"
+           :icon="minusBtnProps.icon"
+           :raised="minusBtnProps.raised"
+           :rounded="minusBtnProps.rounded"
+      />
+    </div>
+    <div id="main-box" class="max-w-[90%] mx-auto direction-rtl">
+      <div id="sura-name" class="mb-4 text-center mx-auto w-40 p-2" >
+        <p class="uthmanTaha-font text-3xl text-center"> الفاتحه </p>
+      </div>
+      <div id="sura-text" v-for="(aya, index) in text" :key="index">
         <div id="aya" class="flex gap-2">
           <p class="uthmanTaha-font text-2xl mb-4">
             {{ aya.main_text }}
@@ -43,8 +52,9 @@
             {{ aya.translation }}
           </p>
         </div>
-      <div v-if="index !== text.length-1">
-        <Divider/>
+        <div v-if="index !== text.length-1">
+          <Divider/>
+        </div>
       </div>
     </div>
   </div>
@@ -181,13 +191,37 @@ const minusBtnProps = {
   raised: true,
   rounded: true
 }
+const allSuraNames = ref([
+  {number : 1, name : 'الفاتحه'},
+  {number : 2, name : 'البقره'},
+  {number : 3, name : 'آل عمران'},
+  {number : 4, name : 'النساء'},
+  {number : 5, name : 'الفاتحه'},
+  {number : 6, name : 'الفاتحه'},
+  {number : 7, name : 'الفاتحه'},
+  {number : 8, name : 'الفاتحه'},
+  {number : 9, name : 'الفاتحه'},
+])
+const allTranslatorsNames = ref([
+  {number: 1, name: 'یوسف علی'},
+  {number: 2, name: 'فولادوند'},
+  {number: 3, name: 'مکارم'},
+])
+const selectSuraProps = {
+  filter : true,
+  allSuraNames
+}
+const selectTranslationProps = {
+  filter : false,
+  allTranslatorsNames
+}
+
 </script>
 
 <style scoped>
 #main-box {
   border: 100px solid transparent;
   border-image: url(../assets/images/border1.png) 360 round;
-  direction: rtl;
 }
 
 #main-box #sura-name{

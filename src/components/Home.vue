@@ -7,13 +7,14 @@
       :options="selectSuraProps.allSuraNames"
       :filter="selectSuraProps.filter"
       :optionLabel="selectSuraProps.optionLabel"
-      @selectedOption="receiveEmit"
+      @selectedOption="receiveSuraDropdownEmit"
       />
       <!-- select translation -->
       <SelectDropDown
       :options="selectTranslationProps.allTranslatorsNames"
       :filter="selectTranslationProps.filter"
       :optionLabel="selectTranslationProps.optionLabel"
+      @selectedOption="receiveTranslatorDropdownEmit"
       />
     </div>
 <!--  btns  -->
@@ -57,7 +58,7 @@
         </div>
         <div id="translation">
           <p class="vazir-font text-lg">
-            {{ aya.translation }}
+            {{ allTranslation[index-1] }}
           </p>
         </div>
         <div v-if="index !== allAya.length">
@@ -83,9 +84,11 @@ import SelectDropDown from "./SelectDropDown.vue";
 // }
 
 const allAya =ref( [])
+const allTranslation =ref( [])
 const allSuraNames = ref([])
 const allTranslatorsNames = ref([])
 const suraNumber = ref(1)
+const translatorId = ref(2)
 const plusBtnProps = {
   severity: "Primary",
   icon: "pi pi-plus",
@@ -145,18 +148,31 @@ function getAllSuraNames () {
 }
 
 function getAya (suraNumber){
+  // get aya
   fetch(`http://localhost:3000/quran/${suraNumber}`)
-
       .then(response => {
         return response.json();
       })
       .then(ayaOfSura => {
         allAya.value = ayaOfSura.data;
       })
+  // get translation
+  fetch(`http://localhost:3000/translation/${translatorId.value}&${suraNumber}`)
+      .then(response => {
+        return response.json();
+      })
+      .then(ayaOfSura => {
+        allTranslation.value = ayaOfSura.data;
+      })
 }
 
-function receiveEmit(value){
+function receiveSuraDropdownEmit(value){
   suraNumber.value = value
+  getAya(suraNumber.value)
+}
+
+function receiveTranslatorDropdownEmit(value){
+  translatorId.value = value
   getAya(suraNumber.value)
 }
 

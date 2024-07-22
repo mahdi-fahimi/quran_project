@@ -1,11 +1,13 @@
 <template >
   <div class="mt-6 relative">
+<!--  drop downs -->
     <div class="flex gap-4 direction-rtl max-w-[87%] mx-auto my-4">
-<!--       select sura-->
+      <!-- select sura -->
       <SelectDropDown
       :options="selectSuraProps.allSuraNames"
       :filter="selectSuraProps.filter"
       :optionLabel="selectSuraProps.optionLabel"
+      @selectedOption="receiveEmit"
       />
       <!-- select translation -->
       <SelectDropDown
@@ -14,6 +16,7 @@
       :optionLabel="selectTranslationProps.optionLabel"
       />
     </div>
+<!--  btns  -->
     <div class="absolute top-72 left-4 flex flex-col gap-2">
       <Btn :severity="plusBtnProps.severity"
            :icon="plusBtnProps.icon"
@@ -26,22 +29,25 @@
            :rounded="minusBtnProps.rounded"
       />
     </div>
+<!--  aya and translation  -->
     <div id="main-box" class="max-w-[90%] mx-auto direction-rtl">
+<!--   sura name   -->
       <div id="sura-name" class="mb-4 text-center mx-auto w-40 p-2" >
         <p class="uthmanTaha-font text-3xl text-center"> الفاتحه </p>
       </div>
-      <div id="sura-text" v-for="(aya, index) in text" :key="index">
+
+      <div id="sura-text" v-for="(aya, index) in allAya" :key="index">
         <div id="aya" class="flex gap-2">
-          <p class="uthmanTaha-font text-2xl mb-4">
-            {{ aya.main_text }}
+          <p  class="uthmanTaha-font text-2xl mb-4">
+            {{ aya }}
           </p>
           <div id="aya-number" class="flex items-center">
             <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Ra_bracket.png"
                  alt="bracket"
                  class="w-3"
             >
-            <span class="vazir-font mx-1 text-lg">
-              {{ aya.aya_number }}
+            <span  class="vazir-font mx-1 text-lg">
+              {{ ++index }}
             </span>
             <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/La_bracket.png"
                  alt="bracket"
@@ -54,40 +60,32 @@
             {{ aya.translation }}
           </p>
         </div>
-        <div v-if="index !== text.length-1">
+        <div v-if="index !== allAya.length">
           <Divider/>
         </div>
       </div>
     </div>
-<!--    <div class="test" v-for="sura in allSuraNames" :key="sura.id">-->
-<!--      {{ sura.sura }}-{{sura.id}}-->
-<!--    </div>-->
   </div>
 </template>
 
 <script setup >
-import {ref, onMounted} from "vue";
-import axios from 'axios'
+import {ref} from "vue";
 import Divider from 'primevue/divider';
 import Btn from './Btn.vue'
 import SelectDropDown from "./SelectDropDown.vue";
 
-let text =ref( [
-  {
-    id : 1,
-    sura_number : 1,
-    aya_number : 1,
-    main_text : 'بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ',
-    translation : 'به نام خداوند رحمتگر مهربان'
-  },
-  {
-    id : 2,
-    sura_number : 1,
-    aya_number : 2,
-    main_text : 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَِ',
-    translation : 'ستایش خدایی را که پروردگار جهانیان'
-  }
-])
+// {
+//   id : 1,
+//   sura_number : 1,
+//   aya_number : 1,
+//   main_text : 'بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ',
+//   translation : 'به نام خداوند رحمتگر مهربان'
+// }
+
+const allAya =ref( [])
+const allSuraNames = ref([])
+const allTranslatorsNames = ref([])
+const suraNumber = ref(1)
 const plusBtnProps = {
   severity: "Primary",
   icon: "pi pi-plus",
@@ -100,8 +98,6 @@ const minusBtnProps = {
   raised: true,
   rounded: true
 }
-const allSuraNames = ref([])
-const allTranslatorsNames = ref([])
 const selectSuraProps = {
   filter : true,
   allSuraNames,
@@ -115,7 +111,7 @@ const selectTranslationProps = {
 
 ///////////////////////////////
 
-async function getAllSuraNames () {
+function getAllSuraNames () {
   // try{
   //   let res = await fetch('http://localhost:3000/sura')
   //   if(res.ok){
@@ -136,7 +132,6 @@ async function getAllSuraNames () {
       // .then(A => console.log(A.data))
       .then(allSuras => {
         allSuraNames.value = allSuras.data;
-        console.log(allSuraNames.value)
       })
 
   fetch('http://localhost:3000/translators')
@@ -145,13 +140,29 @@ async function getAllSuraNames () {
       })
       .then(translators => {
         allTranslatorsNames.value = translators.data;
-        console.log(allTranslatorsNames.value)
       })
 
 }
 
+function getAya (suraNumber){
+  fetch(`http://localhost:3000/quran/${suraNumber}`)
+
+      .then(response => {
+        return response.json();
+      })
+      .then(ayaOfSura => {
+        allAya.value = ayaOfSura.data;
+      })
+}
+
+function receiveEmit(value){
+  suraNumber.value = value
+  getAya(suraNumber.value)
+}
 
 getAllSuraNames()
+
+getAya(suraNumber.value)
 
 </script>
 

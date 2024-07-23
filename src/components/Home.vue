@@ -18,7 +18,9 @@
       :placeholder="selectTranslationProps.placeholder"
       @selectedOption="receiveTranslatorDropdownEmit"
       />
+      <SearchInput/>
     </div>
+
 <!--  btns  -->
     <div class="absolute top-72 left-4 flex flex-col gap-2">
       <Btn :severity="plusBtnProps.severity"
@@ -88,14 +90,7 @@ import {ref} from "vue";
 import Divider from 'primevue/divider';
 import Btn from './Btn.vue'
 import SelectDropDown from "./SelectDropDown.vue";
-
-// {
-//   id : 1,
-//   sura_number : 1,
-//   aya_number : 1,
-//   main_text : 'بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ',
-//   translation : 'به نام خداوند رحمتگر مهربان'
-// }
+import SearchInput from "./SearchInput.vue";
 
 const allAya =ref( [])
 const allTranslation =ref( [])

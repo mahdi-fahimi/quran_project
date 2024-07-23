@@ -7,6 +7,7 @@
       :options="selectSuraProps.allSuraNames"
       :filter="selectSuraProps.filter"
       :optionLabel="selectSuraProps.optionLabel"
+      :placeholder="selectSuraProps.placeholder"
       @selectedOption="receiveSuraDropdownEmit"
       />
       <!-- select translation -->
@@ -14,6 +15,7 @@
       :options="selectTranslationProps.allTranslatorsNames"
       :filter="selectTranslationProps.filter"
       :optionLabel="selectTranslationProps.optionLabel"
+      :placeholder="selectTranslationProps.placeholder"
       @selectedOption="receiveTranslatorDropdownEmit"
       />
     </div>
@@ -34,35 +36,47 @@
     <div id="main-box" class="max-w-[90%] mx-auto direction-rtl">
 <!--   sura name   -->
       <div id="sura-name" class="mb-4 text-center mx-auto w-40 p-2" >
-        <p class="uthmanTaha-font text-3xl text-center"> الفاتحه </p>
+        <p class="uthmanTaha-font text-3xl text-center"> {{ suraName.sura }} </p>
+      </div>
+<!--   بسم الله   -->
+      <div v-if="suraNumber !== 9" class="text-center mt-8">
+        <p  class="uthmanTaha-font text-2xl mb-4">
+          بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ
+        </p>
+        <p  class="uthmanTaha-font text-2xl mb-4">
+          به نام خداوند بخشنده مهربان
+        </p>
+        <Divider/>
       </div>
 
       <div id="sura-text" v-for="(aya, index) in allAya" :key="index">
-        <div id="aya" class="flex gap-2">
-          <p  class="uthmanTaha-font text-2xl mb-4">
-            {{ aya }}
-          </p>
-          <div id="aya-number" class="flex items-center">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Ra_bracket.png"
-                 alt="bracket"
-                 class="w-3"
-            >
-            <span  class="vazir-font mx-1 text-lg">
+        <div v-if="aya !== 'بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ' ">
+          <div id="aya" class="flex gap-2">
+            <p  class="uthmanTaha-font text-2xl mb-4">
+              {{ aya }}
+            </p>
+            <div id="aya-number" class="flex items-center">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Ra_bracket.png"
+                   alt="bracket"
+                   class="w-3"
+              >
+              <span  class="vazir-font mx-1 text-lg">
               {{ ++index }}
             </span>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/La_bracket.png"
-                 alt="bracket"
-                 class="w-3"
-            >
+              <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/La_bracket.png"
+                   alt="bracket"
+                   class="w-3"
+              >
+            </div>
           </div>
-        </div>
-        <div id="translation">
-          <p class="vazir-font text-lg">
-            {{ allTranslation[index-1] }}
-          </p>
-        </div>
-        <div v-if="index !== allAya.length">
-          <Divider/>
+          <div id="translation">
+            <p class="vazir-font text-lg">
+              {{ allTranslation[index-1] }}
+            </p>
+          </div>
+          <div v-if="index !== allAya.length">
+            <Divider/>
+          </div>
         </div>
       </div>
     </div>
@@ -85,6 +99,7 @@ import SelectDropDown from "./SelectDropDown.vue";
 
 const allAya =ref( [])
 const allTranslation =ref( [])
+const suraName = ref('بقره')
 const allSuraNames = ref([])
 const allTranslatorsNames = ref([])
 const suraNumber = ref(1)
@@ -104,12 +119,14 @@ const minusBtnProps = {
 const selectSuraProps = {
   filter : true,
   allSuraNames,
-  optionLabel: 'sura'
+  optionLabel: 'sura',
+  placeholder: 'انتخاب سوره'
 }
 const selectTranslationProps = {
   filter : false,
   allTranslatorsNames,
-  optionLabel: 'translator'
+  optionLabel: 'translator',
+  placeholder: 'انتخاب ترجمه'
 }
 
 ///////////////////////////////
@@ -163,6 +180,14 @@ function getAya (suraNumber){
       })
       .then(ayaOfSura => {
         allTranslation.value = ayaOfSura.data;
+      })
+  // get sura name
+  fetch(`http://localhost:3000/sura/${suraNumber}`)
+      .then(response => {
+        return response.json();
+      })
+      .then(ayaOfSura => {
+        suraName.value = ayaOfSura.data;
       })
 }
 

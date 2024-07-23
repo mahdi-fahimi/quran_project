@@ -6,8 +6,9 @@
             :filter="props.filter"
             variant="filled"
             :optionLabel="props.optionLabel"
+            :placeholder="props.placeholder"
             @change="$emit('selectedOption', selectedOption.id)"
-            class="w-full md:w-36 " />
+            class="w-full md:w-42 " />
   </div>
 </template>
 
@@ -15,9 +16,10 @@
 import {ref, defineProps} from 'vue'
 import Select from 'primevue/select';
 
-const props = defineProps(['filter', 'options', 'optionLabel'])
+const props = defineProps(['filter', 'options', 'optionLabel', 'placeholder'])
 const selectedOption = ref('');
 let propsOptions = props.options;
+
 
 </script>
 

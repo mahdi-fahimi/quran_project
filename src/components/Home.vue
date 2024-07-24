@@ -18,7 +18,9 @@
       :placeholder="selectTranslationProps.placeholder"
       @selectedOption="receiveTranslatorDropdownEmit"
       />
-      <SearchInput/>
+      <SearchInput
+          @search="receiveSearchInputEmit"
+      />
     </div>
 
 <!--  btns  -->
@@ -38,32 +40,40 @@
     <div id="main-box" class="max-w-[90%] mx-auto direction-rtl">
 <!--   sura name   -->
       <div id="sura-name" class="mb-4 text-center mx-auto w-40 p-2" >
-        <p class="uthmanTaha-font text-3xl text-center"> {{ suraName.sura }} </p>
+        <p class="uthmanTaha-font text-3xl text-center ">
+          {{ suraName.sura }}
+        </p>
       </div>
 <!--   بسم الله   -->
       <div v-if="suraNumber !== 9" class="text-center mt-8">
         <p  class="uthmanTaha-font text-2xl mb-4">
           بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ
         </p>
-        <p  class="uthmanTaha-font text-2xl mb-4">
+        <p v-if="translatorId === 1" class="text-lg mb-4">
+          In the name of Allah, Most Gracious, Most Merciful
+        </p>
+        <p v-else-if="translatorId === 2" class="vazir-font text-lg mb-4">
           به نام خداوند بخشنده مهربان
+        </p>
+        <p v-else class="vazir-font text-lg mb-4">
+          ستایش مخصوص خداوندی است که پروردگار جهانیان است
         </p>
         <Divider/>
       </div>
 
-      <div id="sura-text" v-for="(aya, index) in allAya" :key="index">
+      <div id="sura-text" v-for="(aya, index) in allAyaText" :key="index">
         <div v-if="aya !== 'بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ' ">
-          <div id="aya" class="flex gap-2">
-            <p  class="uthmanTaha-font text-2xl mb-4">
+          <div id="aya" >
+            <p  class="uthmanTaha-font text-2xl leading-[4rem] inline text-justify " >
               {{ aya }}
             </p>
-            <div id="aya-number" class="flex items-center">
+            <div id="aya-number" class="inline-flex items-center mr-2 align-middle">
               <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Ra_bracket.png"
                    alt="bracket"
                    class="w-3"
               >
               <span  class="vazir-font mx-1 text-lg">
-              {{ ++index }}
+              {{ allAyaNumber[index] }}
             </span>
               <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/La_bracket.png"
                    alt="bracket"
@@ -72,11 +82,18 @@
             </div>
           </div>
           <div id="translation">
-            <p class="vazir-font text-lg">
+            <p v-if="suraNumber === 1"
+               class="vazir-font text-lg leading-9 text-justify"
+               :class="{'direction-ltr' : translatorId === 1  }">
               {{ allTranslation[index-1] }}
             </p>
+            <p v-else
+               class="vazir-font text-lg leading-9 text-justify"
+               :class="{'direction-ltr' : translatorId === 1}">
+              {{ allTranslation[index] }}
+            </p>
           </div>
-          <div v-if="index !== allAya.length">
+          <div v-if="index !== allAyaText.length-1">
             <Divider/>
           </div>
         </div>
@@ -92,7 +109,8 @@ import Btn from './Btn.vue'
 import SelectDropDown from "./SelectDropDown.vue";
 import SearchInput from "./SearchInput.vue";
 
-const allAya =ref( [])
+const allAyaText =ref( [])
+const allAyaNumber =ref( [])
 const allTranslation =ref( [])
 const suraName = ref('بقره')
 const allSuraNames = ref([])
@@ -166,7 +184,8 @@ function getAya (suraNumber){
         return response.json();
       })
       .then(ayaOfSura => {
-        allAya.value = ayaOfSura.data;
+        allAyaText.value = ayaOfSura.data;
+        allAyaNumber.value = ayaOfSura.ayaNumberArray
       })
   // get translation
   fetch(`http://localhost:3000/translation/${translatorId.value}&${suraNumber}`)
@@ -196,6 +215,17 @@ function receiveTranslatorDropdownEmit(value){
   getAya(suraNumber.value)
 }
 
+function receiveSearchInputEmit(value){
+  fetch(`http://localhost:3000/search/${value}`)
+      .then(response => {
+        return response.json();
+      })
+      .then(searchResult => {
+        allAyaText.value = searchResult.data;
+        console.log(allAyaText.value)
+      })
+}
+
 getAllSuraNames()
 
 getAya(suraNumber.value)
@@ -211,5 +241,9 @@ getAya(suraNumber.value)
 #main-box #sura-name{
   border: 25px solid transparent;
   border-image: url(../assets/images/border2.png) 106 round;
+}
+
+#abc{
+  direction: ltr !important;
 }
 </style>

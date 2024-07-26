@@ -39,13 +39,13 @@
 <!--  aya and translation  -->
     <div id="main-box" class="max-w-[90%] mx-auto direction-rtl">
 <!--   sura name   -->
-      <div id="sura-name" class="mb-4 text-center mx-auto w-40 p-2" >
+      <div v-if="!isSearching" id="sura-name" class="mb-4 text-center mx-auto w-40 p-2" >
         <p class="uthmanTaha-font text-3xl text-center ">
           {{ suraName.sura }}
         </p>
       </div>
 <!--   بسم الله   -->
-      <div v-if="suraNumber !== 9" class="text-center mt-8">
+      <div v-if="suraNumber !== 9 && !isSearching" class="text-center mt-8">
         <p  class="uthmanTaha-font text-2xl mb-4">
           بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ
         </p>
@@ -67,18 +67,29 @@
             <p  class="uthmanTaha-font text-2xl leading-[4rem] inline text-justify " >
               {{ aya }}
             </p>
-            <div id="aya-number" class="inline-flex items-center mr-2 align-middle">
+            <div id="aya-number"
+                 class="inline-flex items-center mr-2 align-middle "
+                 :class="{'text-red-800' : isSearching}">
               <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Ra_bracket.png"
                    alt="bracket"
                    class="w-3"
               >
+              <span v-if="isSearching" class="uthmanTaha-font mx-1 text-xl">
+               {{ allSuraNameSearch[index] }}
+              </span>
               <span  class="vazir-font mx-1 text-lg">
-              {{ allAyaNumber[index] }}
-            </span>
+                {{ allAyaNumber[index] }}
+              </span>
               <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/La_bracket.png"
                    alt="bracket"
                    class="w-3"
               >
+              <div v-if="isSearching"
+                   class="mr-2 bg-gray-300 text-white py-1 px-2 rounded-full hover:bg-black transition ease-in-out cursor-pointer"
+                   @click="changeSura(allSuraNumberSearch[index])"
+              >
+                <i class="pi pi-arrow-left"></i>
+              </div>
             </div>
           </div>
           <div id="translation">
@@ -109,14 +120,20 @@ import Btn from './Btn.vue'
 import SelectDropDown from "./SelectDropDown.vue";
 import SearchInput from "./SearchInput.vue";
 
+
 const allAyaText =ref( [])
 const allAyaNumber =ref( [])
 const allTranslation =ref( [])
 const suraName = ref('بقره')
+const allSuraName = ref([])
+const allSuraNameSearch = ref([])
+const allSuraNumberSearch = ref([])
 const allSuraNames = ref([])
 const allTranslatorsNames = ref([])
 const suraNumber = ref(1)
 const translatorId = ref(2)
+const isSearching = ref(false)
+const searchedText = ref('')
 const plusBtnProps = {
   severity: "Primary",
   icon: "pi pi-plus",
@@ -162,9 +179,12 @@ function getAllSuraNames () {
       .then(response => {
         return response.json();
       })
-      // .then(A => console.log(A.data))
       .then(allSuras => {
         allSuraNames.value = allSuras.data;
+        allSuraNameSearch.value.forEach((suraNumber) => {
+          let suraName = allSuraNames[suraNumber];
+          allSuraName.value.push(suraName);
+        })
       })
 
   fetch('http://localhost:3000/translators')
@@ -206,6 +226,7 @@ function getAya (suraNumber){
 }
 
 function receiveSuraDropdownEmit(value){
+  isSearching.value = false
   suraNumber.value = value
   getAya(suraNumber.value)
 }
@@ -216,19 +237,48 @@ function receiveTranslatorDropdownEmit(value){
 }
 
 function receiveSearchInputEmit(value){
+  isSearching.value = true;
+  searchedText.value = value
   fetch(`http://localhost:3000/search/${value}`)
       .then(response => {
         return response.json();
       })
       .then(searchResult => {
-        allAyaText.value = searchResult.data;
-        console.log(allAyaText.value)
+        allTranslation.value = []
+        allAyaText.value = searchResult.searchTextArray
+        allAyaNumber.value = searchResult.data
+        allSuraNameSearch.value = searchResult.searchSuraNameArray
+        allSuraNumberSearch.value = searchResult.searchSuraNumberArray
       })
 }
+
+function changeSura(value){
+  if(isSearching.value){
+    isSearching.value = false
+    suraNumber.value = value
+    getAya(suraNumber.value)
+  }
+}
+
+function getTranslation(value){
+  fetch(`http://localhost:3000/aya/${value}`)
+      .then(response => {
+        return response.json();
+      })
+      .then(result => {
+        allAyaText.value.push(result.data.text)
+        allAyaNumber.value.push(result.data.aya_number)
+        allSuraNameSearch.value.push(result.data.searchSuraNameArray)
+
+      })
+}
+
 
 getAllSuraNames()
 
 getAya(suraNumber.value)
+
+
 
 </script>
 

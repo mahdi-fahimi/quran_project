@@ -1,5 +1,6 @@
-<template >
-  <div class="mt-6 relative">
+<template class="abc">
+<!--  <a href="#abc">sldfjl</a>-->
+  <div class="mt-6 relative ">
 <!--  drop downs -->
     <div class="flex gap-4 direction-rtl max-w-[87%] mx-auto my-4">
       <!-- select sura -->
@@ -24,7 +25,6 @@
     </div>
 
 <!--  btns  -->
-<!--    <div class="absolute top-72 left-4 flex flex-col gap-2">-->
     <div class="fixed top-72 left-4 flex flex-col gap-2">
       <Btn :severity="plusBtnProps.severity"
            :icon="plusBtnProps.icon"
@@ -32,7 +32,6 @@
            :rounded="plusBtnProps.rounded"
            @click="changeFontSize('+', 2)"
            :title="arabicFontSize"
-
       />
       <Btn :severity="minusBtnProps.severity"
            :icon="minusBtnProps.icon"
@@ -50,9 +49,6 @@
           {{ suraName.sura }}
         </p>
       </div>
-<!--   بسم الله   -->
-<!--      <p class="arabic-font-size"> بسم الله الرحمان  الرحمیم </p>-->
-<!--      <p class="translation-font-size"> بسم الله الرحمان  الرحمیم </p>-->
       <div v-if="suraNumber !== 9 && !isSearching" class="text-center mt-8">
         <p  class="uthmanTaha-font mb-4 arabic-font-size">
           بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ
@@ -105,8 +101,9 @@
                class="vazir-font translation-font-size leading-9 text-justify"
                :class="{'direction-ltr' : translatorId === 1  }">
               {{ allTranslation[index-1] }}
+<!--              {{ allTranslation[index] }}-->
             </p>
-            <p v-else
+            <p v-if="isSearching || suraNumber !== 1"
                class="vazir-font translation-font-size leading-9 text-justify"
                :class="{'direction-ltr' : translatorId === 1}">
               {{ allTranslation[index] }}
@@ -119,6 +116,10 @@
       </div>
     </div>
   </div>
+<!--  <div id="abc">-->
+<!--    Lorem ipsum dolor sit amet.-->
+
+<!--  </div>-->
 </template>
 
 <script setup >
@@ -253,16 +254,17 @@ function receiveTranslatorDropdownEmit(value){
 function receiveSearchInputEmit(value){
   isSearching.value = true;
   searchedText.value = value
+  allTranslation.value = []
   fetch(`http://localhost:3000/search/${value}`)
       .then(response => {
         return response.json();
       })
       .then(searchResult => {
-        allTranslation.value = []
         allAyaText.value = searchResult.searchTextArray
         allAyaNumber.value = searchResult.data
         allSuraNameSearch.value = searchResult.searchSuraNameArray
         allSuraNumberSearch.value = searchResult.searchSuraNumberArray
+        getTranslation(translatorId.value,allSuraNumberSearch.value,allAyaNumber.value)
       })
 }
 
@@ -274,17 +276,18 @@ function changeSura(value){
   }
 }
 
-function getTranslation(value){
-  fetch(`http://localhost:3000/aya/${value}`)
-      .then(response => {
-        return response.json();
-      })
-      .then(result => {
-        allAyaText.value.push(result.data.text)
-        allAyaNumber.value.push(result.data.aya_number)
-        allSuraNameSearch.value.push(result.data.searchSuraNameArray)
-
-      })
+function getTranslation(translatorId, surahNumber, ayaNumber){
+  // console.log(`surahNumber = ${surahNumber}`)
+  for(let i = 0; i < surahNumber.length; i++){
+    fetch(`http://localhost:3000/translation/${translatorId}/${surahNumber[i]}/${ayaNumber[i]}`)
+        .then(response => {
+          return response.json();
+        })
+        .then(result => {
+          allTranslation.value.push(result.data[0])
+        })
+    console.log(allTranslation.value)
+  }
 }
 
 function changeFontSize(operator , n){
@@ -304,8 +307,6 @@ getAllSuraNames()
 
 getAya(suraNumber.value)
 
-
-
 </script>
 
 <style scoped>
@@ -324,6 +325,10 @@ getAya(suraNumber.value)
 }
 .translation-font-size{
   font-size: v-bind(translationFontSizeString);
+}
+
+.abc{
+  background-image: url("../assets/images/11.jpg");
 }
 
 </style>

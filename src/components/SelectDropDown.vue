@@ -23,5 +23,11 @@ let propsOptions = props.options;
 
 </script>
 
-<style scoped>
+<style >
+.p-select-option{
+  direction: rtl;
+}
+.p-inputtext{
+  direction: rtl;
+}
 </style>

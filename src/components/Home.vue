@@ -1,8 +1,7 @@
 <template class="abc">
-<!--  <a href="#abc">sldfjl</a>-->
   <div class="mt-6 relative ">
 <!--  drop downs -->
-    <div class="flex gap-4 direction-rtl max-w-[87%] mx-auto my-4">
+    <div class="flex flex-wrap gap-4 direction-rtl max-w-[87%] mx-auto my-4">
       <!-- select sura -->
       <SelectDropDown
       :options="selectSuraProps.allSuraNames"
@@ -22,6 +21,11 @@
       <SearchInput
           @search="receiveSearchInputEmit"
       />
+      <div v-if="isSearching">
+        <p  class="vazir-font  leading-9 text-justify">
+          {{allAyaText.length}} نتیجه یافت شد.
+        </p>
+      </div>
     </div>
 
 <!--  btns  -->
@@ -42,7 +46,7 @@
       />
     </div>
 <!--  aya and translation  -->
-    <div id="main-box" class="max-w-[90%] mx-auto direction-rtl">
+    <div id="main-box" class="lg:max-w-[90%] mx-auto direction-rtl">
 <!--   sura name   -->
       <div v-if="!isSearching" id="sura-name" class="mb-4 text-center mx-auto w-40 p-2" >
         <p class="uthmanTaha-font text-3xl text-center ">
@@ -65,9 +69,12 @@
         <Divider/>
       </div>
 
-      <div id="sura-text" v-for="(aya, index) in allAyaText" :key="index">
+      <div v-if="allAyaText" id="sura-text" v-for="(aya, index) in allAyaText" :key="index">
         <div v-if="aya !== 'بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ' ">
           <div id="aya" >
+            <span v-if="isSearching" class="vazir-font translation-font-size leading-[4rem] inline text-justify">
+              {{++index}} -
+            </span>
             <p  class="uthmanTaha-font arabic-font-size leading-[4rem] inline text-justify " >
               {{ aya }}
             </p>
@@ -101,7 +108,6 @@
                class="vazir-font translation-font-size leading-9 text-justify"
                :class="{'direction-ltr' : translatorId === 1  }">
               {{ allTranslation[index-1] }}
-<!--              {{ allTranslation[index] }}-->
             </p>
             <p v-if="isSearching || suraNumber !== 1"
                class="vazir-font translation-font-size leading-9 text-justify"
@@ -114,12 +120,13 @@
           </div>
         </div>
       </div>
+      <div v-if="allAyaText.length === 0">
+        <p class="vazir-font translation-font-size leading-9 text-justify">
+          نتیجه ای یافت نشد
+        </p>
+      </div>
     </div>
   </div>
-<!--  <div id="abc">-->
-<!--    Lorem ipsum dolor sit amet.-->
-
-<!--  </div>-->
 </template>
 
 <script setup >
@@ -128,7 +135,6 @@ import Divider from 'primevue/divider';
 import Btn from './Btn.vue'
 import SelectDropDown from "./SelectDropDown.vue";
 import SearchInput from "./SearchInput.vue";
-
 
 const allAyaText =ref( [])
 const allAyaNumber =ref( [])
@@ -167,14 +173,10 @@ const selectTranslationProps = {
   optionLabel: 'translator',
   placeholder: 'انتخاب ترجمه'
 }
-
 const arabicFontSize = ref(24)
 const translationFontSize = ref(18)
 const translationFontSizeString = ref(`${translationFontSize.value}px`)
 const arabicFontSizeString = ref(`${arabicFontSize.value}px`)
-
-
-///////////////////////////////
 
 function getAllSuraNames () {
   // try{
@@ -235,8 +237,8 @@ function getAya (suraNumber){
       .then(response => {
         return response.json();
       })
-      .then(ayaOfSura => {
-        suraName.value = ayaOfSura.data;
+      .then(result => {
+        suraName.value = result.data;
       })
 }
 
@@ -248,7 +250,11 @@ function receiveSuraDropdownEmit(value){
 
 function receiveTranslatorDropdownEmit(value){
   translatorId.value = value
-  getAya(suraNumber.value)
+  if(isSearching.value){
+    getTranslation(value,allSuraNumberSearch.value,allAyaNumber.value)
+  } else {
+    getAya(suraNumber.value)
+  }
 }
 
 function receiveSearchInputEmit(value){
@@ -277,7 +283,6 @@ function changeSura(value){
 }
 
 function getTranslation(translatorId, surahNumber, ayaNumber){
-  // console.log(`surahNumber = ${surahNumber}`)
   for(let i = 0; i < surahNumber.length; i++){
     fetch(`http://localhost:3000/translation/${translatorId}/${surahNumber[i]}/${ayaNumber[i]}`)
         .then(response => {
@@ -286,7 +291,6 @@ function getTranslation(translatorId, surahNumber, ayaNumber){
         .then(result => {
           allTranslation.value.push(result.data[0])
         })
-    console.log(allTranslation.value)
   }
 }
 

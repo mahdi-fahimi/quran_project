@@ -8,7 +8,7 @@
             :optionLabel="props.optionLabel"
             :placeholder="props.placeholder"
             @change="$emit('selectedOption', selectedOption.id)"
-            class="w-full md:w-42 " />
+            class="w-full lg:w-48 " />
   </div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="" id="search-input">
+  <div class="w-full lg:w-56 " id="search-input">
     <InputGroup>
       <InputText
           placeholder="جستجو ..."
